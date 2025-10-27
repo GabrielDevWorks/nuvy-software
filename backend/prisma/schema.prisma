@@ -9,9 +9,10 @@ generator client {
 }
 
 // --------------------------------------------------
-// Nossos modelos de Loja e Usuario
-// (Cole o código dos modelos aqui embaixo se você já os removeu)
+// Nosso Modelo de Dados começa aqui
 // --------------------------------------------------
+
+// Modelo para nossos clientes (as lojas que assinam o sistema)
 model Loja {
   id          String   @id @default(uuid())
   nome        String
@@ -19,9 +20,13 @@ model Loja {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
+  // Relacionamentos
   usuarios    Usuario[]
+  produtos    Produto[]
+  categorias  Categoria[]
 }
 
+// Modelo para os donos das lojas (quem vai logar no painel)
 model Usuario {
   id          String   @id @default(uuid())
   email       String   @unique
@@ -29,6 +34,44 @@ model Usuario {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
+  // Relacionamento: Um Usuário pertence a UMA Loja
   lojaId      String
   loja        Loja     @relation(fields: [lojaId], references: [id])
+}
+
+// Modelo para as Categorias de Produtos (ex: "Pizzas", "Bebidas")
+model Categoria {
+  id      String    @id @default(uuid())
+  nome    String
+  
+  // Relacionamento: Uma Categoria pertence a UMA Loja
+  lojaId  String
+  loja    Loja      @relation(fields: [lojaId], references: [id])
+  
+  // Relacionamento: Uma Categoria pode ter muitos Produtos
+  produtos Produto[]
+  
+  @@unique([lojaId, nome]) // Garante que a loja não tenha categorias com mesmo nome
+}
+
+// Modelo para os Produtos do cardápio
+model Produto {
+  id          String   @id @default(uuid())
+  nome        String
+  descricao   String?  // O '?' significa que é opcional
+  preco       Float    // Usamos Float para valores (ex: 29.99)
+  imagemUrl   String?  // Opcional
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relacionamento: Um Produto pertence a UMA Categoria
+  categoriaId String
+  categoria   Categoria @relation(fields: [categoriaId], references: [id])
+  
+  // Relacionamento: Um Produto pertence a UMA Loja
+  lojaId      String
+  loja        Loja      @relation(fields: [lojaId], references: [id])
+  
+  @@index([lojaId]) // Cria um índice na coluna lojaId para buscas mais rápidas
+  @@index([categoriaId]) // Cria um índice na coluna categoriaId
 }
