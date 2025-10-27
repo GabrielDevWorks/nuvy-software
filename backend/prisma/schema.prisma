@@ -1,14 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-
-
 datasource db {
   provider     = "mysql"
-  url          = env("DATABASE_URL")
+  url          = "mysql://root:008856ga@localhost:3306/nuvy_software"
   relationMode = "prisma"
 }
 
@@ -16,32 +8,27 @@ generator client {
   provider = "prisma-client-js"
 }
 
-
 // --------------------------------------------------
-// Nosso Modelo de Dados começa aqui
+// Nossos modelos de Loja e Usuario
+// (Cole o código dos modelos aqui embaixo se você já os removeu)
 // --------------------------------------------------
-
-// Modelo para nossos clientes (as lojas que assinam o sistema)
 model Loja {
-  id          String   @id @default(uuid()) // Chave primária única (ex: "abc-123-xyz")
-  nome        String   // Nome da loja (ex: "Pizzaria do Zé")
-  subdominio  String   @unique // Subdomínio único (ex: "pizzadoze")
+  id          String   @id @default(uuid())
+  nome        String
+  subdominio  String   @unique
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
-  // Relacionamento: Uma Loja pode ter muitos Usuários
   usuarios    Usuario[]
 }
 
-// Modelo para os donos das lojas (quem vai logar no painel)
 model Usuario {
   id          String   @id @default(uuid())
-  email       String   @unique // O email de login
-  senhaHash   String   // A senha (vamos guardar ela criptografada)
+  email       String   @unique
+  senhaHash   String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
-  // Relacionamento: Um Usuário pertence a UMA Loja
-  lojaId      String   // Chave estrangeira
+  lojaId      String
   loja        Loja     @relation(fields: [lojaId], references: [id])
 }
